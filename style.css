@@ -232,6 +232,27 @@ body {
   outline-offset: 3px;
 }
 
+/* Animation de validation, applicable au bouton "correct" quel qu'il soit */
+.btn.validated {
+  animation: pulseValid 0.5s ease;
+}
+
+@keyframes pulseValid {
+  0%   { box-shadow: 0 0 0 0 var(--success); }
+  60%  { box-shadow: 0 0 0 18px rgba(52, 229, 164, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(52, 229, 164, 0); }
+}
+
+/* Bouton qui rétrécit puis disparaît, applicable à Oui ou Non selon la question */
+.btn.hidden-forever {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0) !important;
+  width: 0;
+  padding: 0;
+  margin: 0;
+}
+
 .btn-oui {
   background: linear-gradient(90deg, var(--accent), var(--accent-2));
   color: #06070c;
@@ -247,24 +268,6 @@ body {
   transform: translateY(0) scale(0.98);
 }
 
-.btn-oui.validated {
-  animation: pulseValid 0.5s ease;
-}
-
-@keyframes pulseValid {
-  0%   { box-shadow: 0 0 0 0 var(--success); }
-  60%  { box-shadow: 0 0 0 18px rgba(52, 229, 164, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(52, 229, 164, 0); }
-}
-
-.btn-non-wrapper {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-width: 90px;
-}
-
 .btn-non {
   background: rgba(255, 255, 255, 0.08);
   color: var(--text-main);
@@ -277,19 +280,11 @@ body {
   border-color: var(--danger);
 }
 
-.btn-non.hidden-forever {
-  opacity: 0;
-  pointer-events: none;
-  transform: scale(0);
-  width: 0;
-  padding: 0;
-  margin: 0;
-}
-
 .attempts-counter {
-  margin: 8px 0 0;
+  margin: 12px 0 0;
   font-size: 0.72rem;
   color: var(--text-muted);
+  text-align: center;
 }
 
 .hint-text {
