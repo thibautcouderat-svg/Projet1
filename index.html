@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sondage officiel — Que pensez-vous de Thibaut ?</title>
+  <meta name="description" content="Sondage officiel et totalement impartial sur Thibaut." />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Éléments lumineux d'ambiance, purement décoratifs -->
+  <div class="glow glow-1" aria-hidden="true"></div>
+  <div class="glow glow-2" aria-hidden="true"></div>
+
+  <main class="app">
+
+    <!-- ===================== ÉCRAN SONDAGE ===================== -->
+    <section id="survey-screen" class="card" aria-live="polite">
+
+      <header class="survey-header">
+        <h1>Sondage officiel</h1>
+        <p class="subtitle">Que pensez-vous de Thibaut ?</p>
+        <p class="disclaimer">
+          Votre avis est important. Les résultats seront analysés par notre comité totalement impartial.
+        </p>
+      </header>
+
+      <div class="progress-wrapper">
+        <div class="progress-bar-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="progress-track">
+          <div class="progress-bar-fill" id="progress-fill"></div>
+        </div>
+        <p class="question-counter" id="question-counter">Question 1 / 5</p>
+      </div>
+
+      <div class="question-box">
+        <p class="question-text" id="question-text"></p>
+
+        <div class="buttons-row">
+          <button
+            id="btn-oui"
+            class="btn btn-oui"
+            type="button"
+            aria-label="Répondre Oui"
+          >
+            Oui
+          </button>
+
+          <div class="btn-non-wrapper">
+            <button
+              id="btn-non"
+              class="btn btn-non"
+              type="button"
+              aria-label="Répondre Non"
+            >
+              Non
+            </button>
+            <p class="attempts-counter" id="attempts-counter" hidden>
+              Tentatives : <span id="attempts-count">0</span>
+            </p>
+          </div>
+        </div>
+
+        <p class="hint-text" id="hint-text" aria-hidden="true"></p>
+      </div>
+
+    </section>
+
+    <!-- ===================== ÉCRAN RÉSULTAT ===================== -->
+    <section id="result-screen" class="card" hidden aria-live="polite">
+      <h1 class="result-title">SONDAGE TERMINÉ</h1>
+      <p class="result-subtitle">Merci d'avoir participé !</p>
+
+      <h2 class="result-section-title">Résultat de l'étude</h2>
+
+      <ul class="stats-list">
+        <li class="stat-item">
+          <span class="stat-emoji" aria-hidden="true">🧠</span>
+          <span class="stat-label">Intelligence</span>
+          <span class="stat-bar-track">
+            <span class="stat-bar-fill" data-target="100"></span>
+          </span>
+          <span class="stat-value">100%</span>
+        </li>
+        <li class="stat-item">
+          <span class="stat-emoji" aria-hidden="true">❤️</span>
+          <span class="stat-label">Gentillesse</span>
+          <span class="stat-bar-track">
+            <span class="stat-bar-fill" data-target="100"></span>
+          </span>
+          <span class="stat-value">100%</span>
+        </li>
+        <li class="stat-item">
+          <span class="stat-emoji" aria-hidden="true">😂</span>
+          <span class="stat-label">Humour</span>
+          <span class="stat-bar-track">
+            <span class="stat-bar-fill" data-target="100"></span>
+          </span>
+          <span class="stat-value">100%</span>
+        </li>
+        <li class="stat-item">
+          <span class="stat-emoji" aria-hidden="true">⭐</span>
+          <span class="stat-label">Qualité générale</span>
+          <span class="stat-bar-track">
+            <span class="stat-bar-fill" data-target="100"></span>
+          </span>
+          <span class="stat-value">100%</span>
+        </li>
+      </ul>
+
+      <p class="conclusion">Conclusion scientifique : Thibaut est officiellement incroyable.</p>
+
+      <p class="methodology">
+        Cette étude a été réalisée selon une méthodologie extrêmement sérieuse et totalement impartiale.
+      </p>
+
+      <p class="money-note">
+        Concernant le virement de 2 500 €, rassurez-vous : aucun argent n'a réellement été transféré.
+      </p>
+
+      <button id="btn-restart" class="btn btn-restart" type="button">
+        Recommencer le sondage
+      </button>
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
