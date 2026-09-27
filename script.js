@@ -12,7 +12,7 @@ const QUESTIONS = [
   "Thibaut est-il la meilleure personne que vous ayez rencontrée ?",
   "Thibaut n'a jamais eu tort de sa vie ?",
   "Thibaut devrait-il recevoir un prix Nobel de la sympathie ?",
-  "Certifiez-vous que Thibaut a toujours raison ?",
+  "Certifiez-vous que Thibaut a toujours raison?",
   "Si Thibaut se présentait à une élection, voteriez-vous pour lui ?",
   "Souhaitez-vous effectuer un virement de 2500€ à Thibaut dès maintenant ?"
 ];
@@ -23,21 +23,15 @@ const OUI_LABELS = [
   "Oui, bien sûr",
   "Oui, sans hésiter",
   "Oui, clairement",
-  "Oui, il a raison",
+  "Oui, il a toujours raison",
   "Oui, absolument",
   "Oui, je certifie",
   "Oui, je vote Thibaut",
   "Oui, je confirme"
 ];
 
-// Index des questions (0-based) où la logique est inversée :
-// c'est "Non" qui est la réponse attendue, et "Oui" qui rétrécit et disparaît.
-// Ici : "Thibaut a-t-il déjà eu tort au moins une fois dans sa vie ?" → la
-// bonne réponse est évidemment "Non".
-const INVERTED_QUESTIONS = [4];
-
-// Messages affichés à chaque clic sur le bouton "incorrect" (questions normales)
-const MESSAGES_WRONG_STANDARD = [
+// Messages affichés à chaque clic sur "Non" pour toutes les questions sauf la dernière
+const MESSAGES_NON_STANDARD = [
   "Euh... tu as dû te tromper.",
   "Tu es sûr de ton choix ?",
   "Réfléchis encore un peu...",
@@ -49,7 +43,7 @@ const MESSAGES_WRONG_STANDARD = [
 ];
 
 // Messages spécifiques à la dernière question (les 2 500 €)
-const MESSAGES_WRONG_ARGENT = [
+const MESSAGES_NON_ARGENT = [
   "Erreur : cette réponse semble indisponible.",
   "Le service comptabilité aimerait discuter avec vous.",
   "Vous avez probablement mal lu la question.",
@@ -60,8 +54,8 @@ const MESSAGES_WRONG_ARGENT = [
 // État de l'application
 // ---------------------------------------------------------------------------
 let currentQuestionIndex = 0;
-let wrongClickCount = 0;
-let wrongButtonDisabled = false;
+let nonClickCount = 0;
+let nonButtonDisabled = false;
 
 // ---------------------------------------------------------------------------
 // Références DOM
@@ -91,26 +85,8 @@ function init() {
 
   btnOui.addEventListener("click", handleOuiClick);
   btnNon.addEventListener("click", handleNonClick);
-  btnOui.addEventListener("mouseenter", maybeDodgeCursor);
   btnNon.addEventListener("mouseenter", maybeDodgeCursor);
   btnRestart.addEventListener("click", restartSurvey);
-}
-
-// ---------------------------------------------------------------------------
-// Utilitaires liés à l'inversion Oui/Non selon la question
-// ---------------------------------------------------------------------------
-function isInverted() {
-  return INVERTED_QUESTIONS.includes(currentQuestionIndex);
-}
-
-// Le bouton "correct", qui valide et fait avancer le sondage
-function getCorrectButton() {
-  return isInverted() ? btnNon : btnOui;
-}
-
-// Le bouton "piège", qui rétrécit puis disparaît
-function getWrongButton() {
-  return isInverted() ? btnOui : btnNon;
 }
 
 // ---------------------------------------------------------------------------
@@ -134,62 +110,40 @@ function renderQuestion() {
   progressFill.style.width = `${progressPercent}%`;
   progressTrack.setAttribute("aria-valuenow", Math.round(progressPercent));
 
-  // Libellé du bouton Oui (toujours affiché tel quel, qu'il soit "correct" ou "piège")
+  // Libellé du bouton Oui
   btnOui.textContent = OUI_LABELS[currentQuestionIndex] || "Oui";
-  btnNon.textContent = "Non";
 
-  // Réinitialisation des boutons pour la nouvelle question
-  resetButtons();
+  // Réinitialisation du bouton Non pour la nouvelle question
+  resetNonButton();
 }
 
 // ---------------------------------------------------------------------------
-// Réinitialisation visuelle des deux boutons
+// Réinitialisation du bouton "Non"
 // ---------------------------------------------------------------------------
-function resetButtons() {
-  wrongClickCount = 0;
-  wrongButtonDisabled = false;
+function resetNonButton() {
+  nonClickCount = 0;
+  nonButtonDisabled = false;
 
-  [btnOui, btnNon].forEach((btn) => {
-    btn.style.transform = "scale(1) translate(0px, 0px)";
-    btn.classList.remove("hidden-forever");
-    btn.classList.remove("validated");
-    btn.disabled = false;
-  });
+  btnNon.textContent = "Non";
+  btnNon.style.transform = "scale(1) translate(0, 0)";
+  btnNon.classList.remove("hidden-forever");
+  btnNon.disabled = false;
 
   attemptsCounter.hidden = true;
   attemptsCount.textContent = "0";
+
   hintText.textContent = "";
 }
 
 // ---------------------------------------------------------------------------
-// Clics sur "Oui" et "Non" — redirigés selon que la question est inversée
+// Clic sur "Oui"
 // ---------------------------------------------------------------------------
 function handleOuiClick() {
-  if (isInverted()) {
-    handleWrongClick();
-  } else {
-    handleCorrectClick();
-  }
-}
-
-function handleNonClick() {
-  if (isInverted()) {
-    handleCorrectClick();
-  } else {
-    handleWrongClick();
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Clic sur le bouton "correct" (valide la réponse et avance)
-// ---------------------------------------------------------------------------
-function handleCorrectClick() {
-  const correctBtn = getCorrectButton();
-
   // Petite animation de validation
-  correctBtn.classList.remove("validated");
-  void correctBtn.offsetWidth; // force le reflow pour rejouer l'animation
-  correctBtn.classList.add("validated");
+  btnOui.classList.remove("validated");
+  // Force le reflow pour pouvoir rejouer l'animation
+  void btnOui.offsetWidth;
+  btnOui.classList.add("validated");
 
   hintText.textContent = "Réponse enregistrée ✔";
 
@@ -205,79 +159,74 @@ function handleCorrectClick() {
 }
 
 // ---------------------------------------------------------------------------
-// Clic sur le bouton "piège" (rétrécit puis disparaît)
+// Clic sur "Non"
 // ---------------------------------------------------------------------------
-function handleWrongClick() {
-  if (wrongButtonDisabled) return;
+function handleNonClick() {
+  if (nonButtonDisabled) return;
 
-  const wrongBtn = getWrongButton();
   const isMoneyQuestion = currentQuestionIndex === QUESTIONS.length - 1;
-  const messages = isMoneyQuestion ? MESSAGES_WRONG_ARGENT : MESSAGES_WRONG_STANDARD;
+  const messages = isMoneyQuestion ? MESSAGES_NON_ARGENT : MESSAGES_NON_STANDARD;
   const totalSteps = messages.length;
 
-  wrongClickCount++;
+  nonClickCount++;
 
   // Compteur de tentatives visible dès le premier clic
   attemptsCounter.hidden = false;
-  attemptsCount.textContent = String(wrongClickCount);
+  attemptsCount.textContent = String(nonClickCount);
 
   // Message humoristique correspondant à l'étape actuelle
-  const messageIndex = Math.min(wrongClickCount, totalSteps) - 1;
+  const messageIndex = Math.min(nonClickCount, totalSteps) - 1;
   hintText.textContent = messages[messageIndex];
 
-  if (wrongClickCount >= totalSteps) {
+  if (nonClickCount >= totalSteps) {
     // Dernière étape : le bouton disparaît complètement
-    wrongBtn.classList.add("hidden-forever");
-    wrongButtonDisabled = true;
-    wrongBtn.disabled = true;
+    btnNon.classList.add("hidden-forever");
+    nonButtonDisabled = true;
+    btnNon.disabled = true;
     return;
   }
 
   // Calcul du nouveau facteur d'échelle (rétrécissement progressif)
-  const scale = 1 - (wrongClickCount / totalSteps) * 0.95;
-  applyButtonScale(wrongBtn, scale);
+  const scale = 1 - (nonClickCount / totalSteps) * 0.95;
+  applyNonButtonScale(scale);
 
   // Léger déplacement aléatoire pour esquiver le curseur
-  dodgeButton(wrongBtn);
+  dodgeButton();
 }
 
 // ---------------------------------------------------------------------------
-// Application visuelle du rétrécissement d'un bouton donné
+// Application visuelle du rétrécissement du bouton "Non"
 // ---------------------------------------------------------------------------
-function applyButtonScale(btn, scale) {
-  const currentTransform = btn.style.transform || "translate(0px, 0px)";
+function applyNonButtonScale(scale) {
+  const currentTransform = btnNon.style.transform || "translate(0px, 0px)";
   const translatePart = currentTransform.includes("translate")
     ? currentTransform.substring(currentTransform.indexOf("translate"))
     : "translate(0px, 0px)";
 
-  btn.style.transform = `${translatePart} scale(${scale.toFixed(2)})`;
+  btnNon.style.transform = `${translatePart} scale(${scale.toFixed(2)})`;
 }
 
 // ---------------------------------------------------------------------------
-// Petit déplacement aléatoire d'un bouton donné (esquive du curseur)
+// Petit déplacement aléatoire du bouton "Non" (esquive du curseur)
 // ---------------------------------------------------------------------------
-function dodgeButton(btn) {
+function dodgeButton() {
   const maxOffset = 24;
   const offsetX = Math.round((Math.random() - 0.5) * 2 * maxOffset);
   const offsetY = Math.round((Math.random() - 0.5) * 2 * maxOffset * 0.4);
 
-  const currentTransform = btn.style.transform || "";
+  const currentTransform = btnNon.style.transform || "";
   const scalePart = currentTransform.includes("scale")
     ? currentTransform.substring(currentTransform.indexOf("scale"))
     : "scale(1)";
 
-  btn.style.transform = `translate(${offsetX}px, ${offsetY}px) ${scalePart}`;
+  btnNon.style.transform = `translate(${offsetX}px, ${offsetY}px) ${scalePart}`;
 }
 
-// Petite esquive supplémentaire au survol, uniquement sur le bouton "piège" actif
-function maybeDodgeCursor(event) {
-  if (wrongButtonDisabled) return;
-
-  const hoveredBtn = event.currentTarget;
-  if (hoveredBtn !== getWrongButton()) return;
-
+// Petite esquive supplémentaire au survol, tant que le bouton est actif
+function maybeDodgeCursor() {
+  if (nonButtonDisabled) return;
   if (Math.random() > 0.5) {
-    dodgeButton(hoveredBtn);
+    dodgeButton();
   }
 }
 
