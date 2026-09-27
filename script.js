@@ -10,6 +10,10 @@ const QUESTIONS = [
   "Thibaut est-il la personne la plus gentille que vous ayez connue ?",
   "Thibaut est-il la personne la plus drôle que vous ayez connue ?",
   "Thibaut est-il la meilleure personne que vous ayez rencontrée ?",
+  "Thibaut a-t-il déjà eu tort au moins une fois dans sa vie ?",
+  "Thibaut devrait-il recevoir un prix Nobel de la sympathie ?",
+  "Certifiez-vous que Thibaut a toujours raison en réunion ?",
+  "Si Thibaut se présentait à une élection, voteriez-vous pour lui ?",
   "Souhaitez-vous effectuer un virement de 2 500 € à Thibaut dès maintenant ?"
 ];
 
@@ -19,10 +23,14 @@ const OUI_LABELS = [
   "Oui, bien sûr",
   "Oui, sans hésiter",
   "Oui, clairement",
+  "Oui, jamais",
+  "Oui, absolument",
+  "Oui, je certifie",
+  "Oui, je vote Thibaut",
   "Oui, je confirme"
 ];
 
-// Messages affichés à chaque clic sur "Non" pour les questions 1 à 4
+// Messages affichés à chaque clic sur "Non" pour toutes les questions sauf la dernière
 const MESSAGES_NON_STANDARD = [
   "Euh... tu as dû te tromper.",
   "Tu es sûr de ton choix ?",
@@ -34,7 +42,7 @@ const MESSAGES_NON_STANDARD = [
   "Très bien."
 ];
 
-// Messages spécifiques à la question 5 (les 2 500 €)
+// Messages spécifiques à la dernière question (les 2 500 €)
 const MESSAGES_NON_ARGENT = [
   "Erreur : cette réponse semble indisponible.",
   "Le service comptabilité aimerait discuter avec vous.",
@@ -94,7 +102,7 @@ function renderQuestion() {
     questionText.classList.remove("leaving");
   }, 200);
 
-  // Compteur "Question X / 5"
+  // Compteur "Question X / N"
   questionCounter.textContent = `Question ${currentQuestionIndex + 1} / ${total}`;
 
   // Barre de progression
@@ -231,16 +239,6 @@ function showResultScreen() {
 
   // Barre de progression à 100% (visuel, même si l'écran change)
   progressFill.style.width = "100%";
-
-  // Animation des barres de statistiques
-  const statBars = resultScreen.querySelectorAll(".stat-bar-fill");
-  statBars.forEach((bar) => {
-    const target = bar.getAttribute("data-target") || "100";
-    // Léger délai pour laisser l'écran s'afficher avant l'animation
-    setTimeout(() => {
-      bar.style.width = `${target}%`;
-    }, 150);
-  });
 }
 
 // ---------------------------------------------------------------------------
@@ -248,12 +246,6 @@ function showResultScreen() {
 // ---------------------------------------------------------------------------
 function restartSurvey() {
   currentQuestionIndex = 0;
-
-  // Réinitialisation des barres de statistiques pour la prochaine fois
-  const statBars = resultScreen.querySelectorAll(".stat-bar-fill");
-  statBars.forEach((bar) => {
-    bar.style.width = "0%";
-  });
 
   resultScreen.hidden = true;
   surveyScreen.hidden = false;
